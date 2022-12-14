@@ -1,0 +1,222 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+@TeleOp
+
+public class DriverControlled extends LinearOpMode {
+    //creating the four tetrix motors that move the robot 
+    private DcMotor RightBackMotor; //instatiates a DC Motor
+    private DcMotor LeftBackMotor;
+    private Servo LeftServo; //instatiates a servo
+    private Servo RightServo;
+    private double servoPosition;
+    private boolean oldServoButton;
+    private boolean initializeServo;
+    private boolean toggleReady = false;
+    private boolean toggleReadyTwo = false;
+    boolean armStatus = false;
+    boolean armStatusTwo = false;
+    private int armPosition;
+    private int armTargetPosition;
+    
+    
+    private DcMotor armMotor;
+
+    String startUpMessage = "Ready";
+    private ElapsedTime runtime = new ElapsedTime();
+
+    @Override
+    public void runOpMode(){
+        RightBackMotor = hardwareMap.get(DcMotor.class, "RBMotor");
+        LeftBackMotor = hardwareMap.get(DcMotor.class, "LBMotor");
+        LeftServo = hardwareMap.get(Servo.class, "Left");
+        RightServo = hardwareMap.get(Servo.class, "Right");
+        armMotor = hardwareMap.get(DcMotor.class, "Arm");
+        servoPosition = 0;
+        oldServoButton = false;
+        armTargetPosition = 0;
+        boolean armIsLevelOne = true;
+        boolean armIsLevelTwo = true;
+        boolean armIsLevelThree = true;
+       
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armPosition = 0;
+        
+        
+        
+        
+        boolean toggleReady = false;
+        
+        boolean toggleReadyTwo = false;
+        
+        
+        initializeServo = false; //gives servo its intial proper open postion
+        
+       
+       
+        telemetry.addData("Status", startUpMessage);
+        telemetry.update();
+       
+       
+        waitForStart();
+        runtime.reset();
+        
+        //moving gamepad joystick all the way to the top sets the value to 1, while all the way down sets it to -1
+        while (opModeIsActive()) { //creates while loop
+            boolean armLevelOne = gamepad1.a; //button for arm up
+            boolean armLevelTwo = gamepad1.b;
+            boolean armLevelThree = gamepad1.y;
+            
+            
+            double leftPower;
+            double rightPower;
+            
+
+            /*
+            if(armLevelOne == true && armIsUp == false){
+                armTargetPosition = 1000;
+                armMotor.setTargetPosition(armTargetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(.6);
+                
+                armIsUp = true;
+            }
+            
+            if(armLevelOne == true && armIsUp == true){
+                armTargetPosition = -100;
+                armMotor.setTargetPosition(armTargetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(.6);
+            }
+            
+            */
+            
+            
+            
+            
+            
+            
+            
+            if(armLevelOne == false){
+                armIsLevelOne = true;
+            }
+            
+            if(armLevelOne && armIsLevelOne){
+                armIsLevelOne = false;
+                if(armStatus == false){
+                    armTargetPosition = 1300;
+                    armMotor.setTargetPosition(armTargetPosition);
+                    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armMotor.setPower(.6);
+                    armStatus = true;
+                }
+            
+            
+            else if (armStatus == true){
+                armTargetPosition = -10;
+                armMotor.setTargetPosition(armTargetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(.6);
+                armStatus = false;
+            }
+          }
+            
+           
+          if(armLevelTwo == false){
+                armIsLevelTwo = true;
+            }
+            
+            if(armLevelTwo && armIsLevelTwo){
+                armIsLevelTwo = false;
+                if(armStatus == false){
+                    armTargetPosition = 2100;
+                    armMotor.setTargetPosition(armTargetPosition);
+                    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armMotor.setPower(.6);
+                    armStatus = true;
+                }
+            
+            
+            else if (armStatus == true){
+                armTargetPosition = -12;
+                armMotor.setTargetPosition(armTargetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(.6);
+                armStatus = false;
+            }
+          }
+            
+            
+            if(armLevelThree == false){
+                armIsLevelThree = true;
+            }
+            
+            if(armLevelThree && armIsLevelThree){
+                armIsLevelThree = false;
+                if(armStatus == false){
+                    armTargetPosition = 2800;
+                    armMotor.setTargetPosition(armTargetPosition);
+                    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armMotor.setPower(.6);
+                    armStatus = true;
+                }
+            
+            
+            else if (armStatus == true){
+                armTargetPosition = -17;
+                armMotor.setTargetPosition(armTargetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(.6);
+                armStatus = false;
+            }
+          }
+            
+            
+           if(initializeServo == false){
+              LeftServo.setPosition(.5);
+              RightServo.setPosition(.2);
+           }
+           
+            initializeServo = true;
+
+         
+            //Driving controls
+            double drive = gamepad1.left_stick_y;
+            double turn  =  -gamepad1.right_stick_x;
+            leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+            rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+          
+            RightBackMotor.setPower(-rightPower); 
+            LeftBackMotor.setPower(leftPower);
+           
+
+            boolean servoButton = gamepad1.x; //button that controls the claw
+            
+            if(servoButton && !oldServoButton){
+                if(servoPosition == 0){
+                   LeftServo.setPosition(.6);
+                   RightServo.setPosition(.1);
+                   servoPosition = 1;
+               }
+                else {
+                    LeftServo.setPosition(.3);
+                    RightServo.setPosition(.4);
+                    servoPosition = 0;
+                }
+                
+            }
+           
+         oldServoButton = servoButton;
+ 
+        }
+    }
+    
+
+}
