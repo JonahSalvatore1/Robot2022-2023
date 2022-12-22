@@ -1,0 +1,214 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+@Autonomous(name = "RightSide")
+
+public class RightSide extends LinearOpMode{
+    private DcMotor leftBackMotor;
+    private DcMotor rightBackMotor;
+    private Servo leftServo;
+    private Servo rightServo;
+    private DcMotor armMotor;
+    private double leftServoPosition;
+    private double rightServoPosition;
+    private int leftPosition;
+    private int rightPosition;
+    private int armPosition; //where arm should go to
+    private boolean openClaw;
+    ColorSensor color;
+    
+    
+    public void runOpMode(){
+        leftBackMotor = hardwareMap.get(DcMotor.class, "LBMotor");
+        rightBackMotor = hardwareMap.get(DcMotor.class, "RBMotor");
+        armMotor = hardwareMap.get(DcMotor.class, "Arm");
+        leftServo = hardwareMap.get(Servo.class, "Left");
+        rightServo = hardwareMap.get(Servo.class, "Right");
+        color = hardwareMap.get(ColorSensor.class, "colorSensor");
+        
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftPosition = 0;
+        rightPosition = 0;
+        armPosition = 0;
+        
+        int zone = 0;
+        
+        
+        telemetry.addLine("Robot is ready for autonomous mode.");
+        telemetry.update();
+        
+        waitForStart();
+        /*autonomous coding instructions: There are currently three methods to control the robot 
+        in autonomous : drive, moveArm, claw.
+        
+        - drive gives the right and leftwheel a target position as well as a speed. Adding negative
+        values to the positions makes the robot goes forward, so to turn the robot put one to 
+        negative and one to positive depending on which way you want to turn.
+        
+        - moveArm takes the position of where the arm will go as well as power, again negative values
+        will make the arm move down.
+        
+        - claw can either be set to true or false, true means claw will open and false means claw will 
+        close/
+        
+        -sleep is used to make the robot wait in between methods.
+        */
+        
+        //color information
+          telemetry.addData("Red", color.red());
+            telemetry.addData("Green", color.green());
+            telemetry.addData("Blue", color.blue());
+            telemetry.update();
+            
+        //default grabbing position for the robot
+        rightServo.setPosition(.4);
+        leftServo.setPosition(.3);
+      
+        // 13 cm to the first line
+       //first part to cone
+        
+        drive(2000, 2000, 0.75);
+        sleep(3000);
+        drive(-200, 200,0.75);
+        drive(600, 600, 0.75);
+        sleep(3000);
+       
+        if(color.red() > color.green() && color.red() > color.blue()){
+            zone = 1;
+             // turn left red is 1
+        }
+        
+        if(color.blue() > color.red() && color.blue() > color.green()){
+            zone = 2;
+             // turn right blue is 2
+        }
+        
+        if(color.green() > color.red() && color.green() > color.blue()){
+            zone = 3; // turn right blue is 2
+        }
+        
+       
+        /*
+        if(zone == 1){
+            drive(3000, -3000, 0.75);
+            drive(1000, 1000, 0.75);
+        }
+        
+         
+        if(zone == 2){
+            
+        }
+        
+        else{
+            drive(-2000, 2000, 0.75);
+            drive(1000, 1000, 0.75);
+        }
+ */
+ 
+  /*
+  
+  
+  
+  
+        //OLD CODE
+         sleep(2000);
+         moveArm(200, 0.5);
+         drive(5800, 5800, 0.75); //go straight
+         drive(-560, 550, 0.25); //turn left
+         moveArm(2700, 0.5);
+         drive(600, 600, 0.5);
+         sleep(1000);
+         claw(true);
+         sleep(1000);
+         drive(-800, -800, 0.5);
+         moveArm(-2875, 0.5);
+         sleep(1000);
+      */   
+         /*
+         claw(true);
+         moveArm(575, 0.5);
+         drive(300,300, 0.5);
+         drive(1600, -1600, 0.5);
+         drive(2200, 2200, 0.5);
+         drive(200,200,0.25);
+         sleep(1000);
+         claw(false);
+         sleep(1000);
+         moveArm(300, 0.5);
+         drive(-2000, -200, 0.75);
+         moveArm(500, 0.5);
+        /*
+         drive(1600, -1600, 0.5);
+         drive(2000, 2000, 0.75);
+        
+        
+         moveArm(575, 0.5);
+         sleep(1000);
+         claw(false);
+         sleep(1000);
+    */
+    
+      //   drive(-500, -500, 0.5);
+         //sleep(1000);
+      //   drive(-200, -200, 0.25);
+        // moveArm(-2750, 0.5);
+       //  drive(-600, -600, 0.25); //reverse
+       //  drive(-700, 700, 0.25); //turn left
+       //  drive(2500, 2500, 0.25); //go straight 
+    }
+    
+    private void claw(boolean openOrClose){
+        openClaw = openOrClose;
+        
+        if(openClaw){
+            rightServo.setPosition(.2);
+            leftServo.setPosition(.5);
+        }
+        
+        else{
+            rightServo.setPosition(.4);
+            leftServo.setPosition(.3);
+        }
+    }
+    
+     private void moveArm(int armTargetPosition, double power){
+         
+         armPosition += armTargetPosition;
+         armMotor.setTargetPosition(armPosition);
+         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+         
+         armMotor.setPower(power);
+         
+         
+         while(opModeIsActive() && armMotor.isBusy()){
+            idle();
+        }
+    }
+    
+    private void drive(int leftTarget, int rightTarget, double speed){
+        leftPosition += leftTarget;
+        rightPosition += rightTarget;
+        
+        leftBackMotor.setTargetPosition(leftPosition);
+        rightBackMotor.setTargetPosition(rightPosition);
+        
+        leftBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   
+        leftBackMotor.setPower(speed);
+        rightBackMotor.setPower(speed);
+        
+        while(opModeIsActive() && leftBackMotor.isBusy() && rightBackMotor.isBusy()){
+            idle();
+        }
+    }
+}
